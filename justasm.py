@@ -17,7 +17,7 @@ class Assembler:
     syntax = AsmSyntax.ATT
     def __init__(self, syntax = AsmSyntax.ATT, bitsize = 64):
         self.syntax = syntax
-        self.asmcache = os.path.curdir + "/asm_cache"
+        self.asmcache = os.getcwd() + "/asm_cache"
         
         if not os.path.exists(self.asmcache):
             os.mkdir(self.asmcache)    
@@ -72,9 +72,10 @@ class Assembler:
         subprocess.run(argv, stdout=subprocess.DEVNULL)
         # The above compiled an ELF, but we only need the bytecode,
         # so extract the text segment:
-        subprocess.Popen([shutil.which('objcopy'), '-O', 'binary', '-j', '.text', 
+        extractor = subprocess.Popen([shutil.which('objcopy'), '-O', 'binary', '-j', '.text', 
                           self.asmcache + "/a.out", 
                           self.asmcache + "/out.bin"], stdout=subprocess.DEVNULL)
+        extractor.wait()
         out_file = open(self.asmcache + "/out.bin", "rb")
         res = out_file.read()
         out_file.close()
